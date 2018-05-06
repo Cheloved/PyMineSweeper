@@ -51,7 +51,7 @@ class Block:
             blocksButtons[self._id]['bg'] = '#cccccc'
             marked = 0
             messagebox.showinfo('End', 'Game Over')
-            begin()
+            begin(None)
             return
         blocksButtons[self._id]['text'] = str(self.near)
         
@@ -102,11 +102,14 @@ class Block:
             marked -= 1
             bombCount['text'] = str(marked) + '/' + str(bombs)
 
+
 width = 10
 height = 10
 bombs = 0
 marked = 0
 blockSide = 40
+diffs = [10,20,30,40,50,60,70,80,90]
+currentDiff = 3
 root.geometry(str(width * blockSide) + 'x' + str(height * blockSide + 40))
 root.title('Minesweeper')
 
@@ -117,7 +120,7 @@ n = 0
 bombCount = Label(text='hello', height=1, font=('Helvetica', '18'))
 bombCount.place(width=76, x=(width*blockSide/2)-38, y=5)
 
-def begin():
+def begin(event):
     global width
     global height 
     global bombs
@@ -125,6 +128,8 @@ def begin():
     global blocks
     global n
     global blockSide
+    global diffs
+    global currentDiff
     width = 10
     height = 10
     bombs = 0
@@ -132,11 +137,12 @@ def begin():
     blockSide = 40
     blocksButtons = []
     blocks = []
+    diffs = [10,20,30,40,50,60,70,80,90]    
     n = 0    
     for x in range(height):
         for y in range(width):
             b = 0
-            if random.randint(2,4) == 4:
+            if random.randint(1,100) > 100-diffs[currentDiff]:
                 b = 1
                 bombs = bombs + 1
                 
@@ -185,6 +191,32 @@ def winCheck():
         messagebox.showinfo('Win!', 'Congratulations!')
         begin()
 
-begin()
-
+def addDifficulty(event):
+    global currentDiff
+    currentDiff += 1
+    if currentDiff >= 9:
+        currentDiff = 0
+    messagebox.showinfo('Current difficult', str((currentDiff+1)*10))
+    begin(None)
+def subDifficulty(event):
+    global currentDiff
+    currentDiff -= 1 
+    if currentDiff < 0:
+        currentDiff = 8    
+    messagebox.showinfo('Current difficult', str((currentDiff+1)*10))
+    begin(None)
+def help():
+    h = Tk()
+    h.title('Help window')
+    h.geometry('400x130')
+    l1 = Label(h, text='Current difficulty: ~40 mines per 100 blocks', font=('Helvetica', '14')).pack(anchor=NW, fill=Y)
+    l2 = Label(h, text='\"E\" to add 10 to current difficulty', font=('Helvetica', '14')).pack(anchor=NW, fill=Y)
+    l3 = Label(h, text='\"D\" to subtract 10 from current difficulty', font=('Helvetica', '14')).pack(anchor=NW, fill=Y)
+    l4 = Label(h, text='\"R\" to restart the game', font=('Helvetica', '14')).pack(anchor=NW, fill=Y)
+    h.mainloop()
+begin(None)
+#help()
+root.bind('e', addDifficulty)
+root.bind('d', subDifficulty)
+root.bind('r', begin)
 root.mainloop()
